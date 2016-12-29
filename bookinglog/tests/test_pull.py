@@ -1,5 +1,4 @@
 from pkg_resources import resource_filename
-import sys
 import unittest
 
 from bookinglog import pull
@@ -15,17 +14,12 @@ class TestParsing(unittest.TestCase):
 
         self.assertEqual(len(out), 2)
 
-        self.assertIn("arrest-table", out[0])
-        self.assertIn("charge-table", out[0])
-        self.assertIn("personal-table", out[0])
+        self.assertEqual(len(out[0]), 2)
+        self.assertEqual(len(out[1]), 2)
 
-        self.assertEqual(
-            out[0]["arrest-table"]["Name"],
-            "DUNLOP, FUZZY"
-        )
+        self.assertEqual(out[0][0]["Name"], "DUNLOP, FUZZY")
+        self.assertEqual(len(out[0][1]), 5)
 
-        self.assertEqual(
-            out[1]["arrest-table"]["Name"],
-            "RODRIGUEZ, BENDER BENDING"
-        )
+        self.assertEqual(out[1][0]["Name"], "RODRIGUEZ, BENDER BENDING")
+        self.assertEqual(len(out[1][1]), 2)
 

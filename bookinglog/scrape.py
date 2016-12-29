@@ -38,12 +38,8 @@ def ingest(entries, cursor):
     None
     """
 
-    for entry in entries:
-        arrest_table = entry["arrest-table"]
-        personal_table = entry["personal-table"]
-        charges = entry["charge-table"]
-        # These should have disjoint keys.
-        merged = models.rename({**arrest_table, **personal_table})
+    for inmate_table, charges in entries:
+        merged = models.rename(inmate_table)
 
         booking_entry = models.make_entry(**merged)
         cursor.execute(models.insert_entry, tuple(booking_entry))

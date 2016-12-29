@@ -71,24 +71,20 @@ def convert(entry):
     """ Convert text to native objects and update keys."""
 
     # Standardize keys to match database columns/model fields.
-    charges_kw = map(keywordize, entry["charge-table"])
-    arrest_kw = keywordize(entry["arrest-table"])
-    inmate_kw = keywordize(entry["personal-table"])
+    inmate, charges = entry
+    charges_kw = map(keywordize, charges)
+    inmate_kw = keywordize(inmate)
 
     # Convert text to native objects.
     charges = [update(charge, "bail", parse_bail) for charge in charges_kw]
-    arrest = reduce(
+    inmate_kw = reduce(
         lambda d, k: update(d, k, convert_dt),
         ("arrest_date", "latest_charge_date", "orig_booking_date"),
-        arrest_kw)
+        inmate_kw)
     inmate = update(
         update(inmate_kw, "date_of_birth", convert_dob),
         "height",
         parse_height)
 
-    out = {
-        "charge-table": charges,
-        "arrest-table": arrest,
-        "personal-table": inmate}
-    return out
+    return inmate, charges
 

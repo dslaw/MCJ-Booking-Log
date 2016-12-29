@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from collections import ChainMap
 from selenium import webdriver
 
+
 # Each inmate entry has 3 tables:
 #
 # 1. Booking Information (arrest-table)
@@ -57,57 +58,34 @@ def parse_table(table):
     pairs = dict(ChainMap(*parsed))
     return pairs
 
-def format_tables(arrest, personal, charge):
-    """ Create a convenient representation of the parsed tables."""
-
-    mapping = {
-        "arrest-table": arrest,
-        "personal-table": personal,
-        "charge-table": charge,
-    }
-
-    return mapping
-
 def parse(html):
     soup = BeautifulSoup(html, "html.parser")
 
-    # Find the data sections. Each inmate has three tables:
-    # Arrest, Personal, Charges.
+    # Find data sections. Each inmate has three tables:
+    # Arrest | Personal
+    # -----------------
+    #      Charges
     top_sections = soup.find_all("div", {"id": "sec1"})
+    paired_tables = (section.find_all("table") for section in top_sections)
     charge_tables = soup.find_all("div", {"id": "sec2"})
 
-    subtables = (section.find_all("table") for section in top_sections)
-    arrest_tables, personal_tables = zip(*subtables)
-
-    # Parse data into json.
-    arrest_tables = map(parse_table, arrest_tables)
-    personal_tables = map(parse_table, personal_tables)
+    # Parse data into maps.
+    # Merge arrest and personal tables together.
+    paired_tables = (map(parse_table, tables) for tables in paired_tables)
+    inmate_tables = ({**arrest, **personal} for arrest, personal in paired_tables)
     charge_tables = map(parse_charges, charge_tables)
 
-    groups = zip(arrest_tables, personal_tables, charge_tables)
-    entries = [format_tables(*group) for group in groups]
-    return entries
+    entries = zip(inmate_tables, charge_tables)
+    return list(entries)
 
-def search_terms(term, key_only=True):
+def search_terms(term):
     """ Mapping to POST search terms."""
 
     terms = {
-        "latest": {
-            "name": "DisplayLatestBookings",
-            "value": "Last 48 Hours"
-        },
-        "current": {
-            "name": "DisplayAllBookings",
-            "value": "Currently In Custody"
-        },
-        "last-name": {
-            "name": "LastName",
-            "value": ""
-        }
+        "latest": "DisplayLatestBookings",  # Last 48 Hours
+        "current": "DisplayAllBookings",    # Currently In Custody
     }
-
-    kv = terms[term]
-    return kv["name"] if key_only else kv
+    return terms[term]
 
 def scrape(query_type):
     """ Download Booking Log page source."""
@@ -124,7 +102,6 @@ def scrape(query_type):
     browser = webdriver.PhantomJS()
     browser.get(uri)
 
-    # Won't work for Last Name search!
     button_name = search_terms(query_type)
     search_button = browser.find_element_by_name(button_name)
 
