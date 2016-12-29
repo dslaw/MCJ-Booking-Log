@@ -1,4 +1,6 @@
 from datetime import datetime
+from pkg_resources import resource_filename
+import json
 import pytz
 import unittest
 
@@ -118,4 +120,18 @@ class TestCoerce(unittest.TestCase):
         invalid_date = "Sept. 15, 2016 4:15 PM"
         out_invalid_date = coerce.convert_dt(invalid_date)
         self.assertEqual(out_invalid_date, None)
+
+    def test_convert(self):
+        mock_json = resource_filename("bookinglog", "tests/data/mock.json")
+        with open(mock_json, "r") as fh:
+            data = json.load(fh)
+
+        inmate, charges = coerce.convert(*data)
+
+        self.assertEqual(inmate["jail_id"], "PJAILID12")
+        self.assertEqual(inmate["weight"], 200)
+
+        self.assertEqual(len(charges), 2)
+        self.assertEqual(charges[0]["bail"], 0)
+        self.assertIsNone(charges[1]["bail"])
 

@@ -22,6 +22,7 @@ from bookinglog import coerce
 from bookinglog import config
 from bookinglog import models
 from bookinglog import pull
+from itertools import starmap
 
 
 def ingest(entries, cursor):
@@ -76,7 +77,7 @@ def main():
         logging.info("Starting ingest")
         html = pull.scrape(args.search)
         entries = pull.parse(html)
-        converted_entries = map(coerce.convert, entries)
+        converted_entries = starmap(coerce.convert, entries)
     except Exception as e:
         msg = "Failed scraping with {0}".format(e)
         logging.critical(msg)

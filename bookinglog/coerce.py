@@ -1,7 +1,8 @@
 """ Cast text to native data types."""
 
 from datetime import datetime
-from functools import reduce
+from functools import partial
+from schema import And, Schema, Use
 
 import logging
 import pytz
@@ -67,24 +68,45 @@ def convert_dt(x):
     localized = pacific.localize(dt)
     return localized
 
-def convert(entry):
-    """ Convert text to native objects and update keys."""
+def len_eq(x, n):
+    return len(x) == n
 
-    # Standardize keys to match database columns/model fields.
-    inmate, charges = entry
-    charges_kw = map(keywordize, charges)
-    inmate_kw = keywordize(inmate)
+len_eq1 = partial(len_eq, n=1)
+len_eq3 = partial(len_eq, n=3)
 
-    # Convert text to native objects.
-    charges = [update(charge, "bail", parse_bail) for charge in charges_kw]
-    inmate_kw = reduce(
-        lambda d, k: update(d, k, convert_dt),
-        ("arrest_date", "latest_charge_date", "orig_booking_date"),
-        inmate_kw)
-    inmate = update(
-        update(inmate_kw, "date_of_birth", convert_dob),
-        "height",
-        parse_height)
+inmate_schema = Schema({
+    "address": str,
+    "arrest_agency": str,
+    "arrest_date": Use(convert_dt),
+    "arrest_location": str,
+    "date_of_birth": Use(convert_dob),
+    "eye_color": And(str, len_eq3),
+    "hair_color": And(str, len_eq3),
+    "height": Use(parse_height),
+    "jail_id": str,
+    "latest_charge_date": Use(convert_dt),
+    "name": str,
+    "occupation": str,
+    "orig_booking_date": Use(convert_dt),
+    "race": And(str, len_eq1),
+    "sex": And(str, len_eq1),
+    "weight": Use(int)
+})
 
+charge_schema = Schema([{
+    "bail": Use(parse_bail),
+    "charge": str,
+    "charge_authority": str,
+    "description": str,
+    "level": And(str, len_eq1)
+}])
+
+
+def convert(inmate, charges):
+    """ Convert data to native objects."""
+
+    # Standardize keys and coervert/validate data.
+    inmate = inmate_schema.validate(keywordize(inmate))
+    charges = charge_schema.validate(list(map(keywordize, charges)))
     return inmate, charges
 
