@@ -2,7 +2,7 @@ create table booking (
     id serial primary key,
     jail_id varchar(9) unique, /* natural key */
     orig_booking_date timestamp,
-    latest_charge_date timestamp,
+    latest_charge_date timestamp
 );
 
 create table arrests (

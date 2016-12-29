@@ -14,13 +14,14 @@ Valid searches are:
 #last-name : search for a specific inmate by last name.
 
 import argparse
+import json
 import logging
 import psycopg2
 import sys
 
 from bookinglog import coerce
 from bookinglog import config
-from bookinglog import models
+from bookinglog import queries
 from bookinglog import pull
 from itertools import starmap
 
@@ -40,19 +41,19 @@ def ingest(entries, cursor):
     """
 
     for inmate_table, charges in entries:
-        merged = models.rename(inmate_table)
-
-        booking_entry = models.make_entry(**merged)
-        cursor.execute(models.insert_entry, tuple(booking_entry))
+        record = inmate_table.copy()
+        cursor.execute(queries.insert_entry, record)
         booking_id = cursor.fetchone()[0]
+        record["booking_id"] = booking_id
 
-        arrest_entry = models.make_arrest(**merged, booking_id=booking_id)
-        inmate_entry = models.make_inmate(**merged, booking_id=booking_id)
-        charges_entry = models.make_charges(charges, booking_id=booking_id)
+        charges_record = {
+            "booking_id": booking_id,
+            "recorded": json.dumps(charges),
+        }
 
-        cursor.execute(models.insert_arrest, tuple(arrest_entry))
-        cursor.execute(models.insert_inmate, tuple(inmate_entry))
-        cursor.execute(models.insert_charge, tuple(charges_entry))
+        cursor.execute(queries.insert_arrest, record)
+        cursor.execute(queries.insert_inmate, record)
+        cursor.execute(queries.insert_charge, charges_record)
 
     return
 
