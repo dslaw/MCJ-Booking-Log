@@ -1,4 +1,4 @@
-""" Scrape and parse Booking Log results page."""
+"""Scrape and parse Booking Log results page."""
 
 from bs4 import BeautifulSoup
 from collections import ChainMap

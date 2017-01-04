@@ -1,4 +1,4 @@
-""" Cast text to native data types."""
+"""Cast text to native data types."""
 
 from datetime import datetime
 from functools import partial

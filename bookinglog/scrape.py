@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-
-"""
-Scrape Marin County Jail Booking Log.
+"""Scrape Marin County Jail Booking Log.
 
 Conduct a search of the public booking log and store the
 results. PhantomJS is used to scrape the search results.
@@ -19,10 +16,10 @@ import logging
 import psycopg2
 import sys
 
-from bookinglog import coerce
-from bookinglog import config
-from bookinglog import queries
-from bookinglog import pull
+from . import coerce
+from . import config
+from . import queries
+from . import pull
 from itertools import starmap
 
 
@@ -71,7 +68,7 @@ def main():
     args = parser.parse_args()
 
     logging.basicConfig(**config.logging_cfg)
-    logging.debug("Running with arguments: {0}".format(args))
+    logging.info("Running with arguments: {0}".format(args))
 
 
     try:
@@ -85,7 +82,7 @@ def main():
         sys.exit(1)
     else:
         msg = "Scraped {0} entries".format(len(entries))
-        logging.debug(msg)
+        logging.info(msg)
 
     with psycopg2.connect(**config.pg_kwargs) as conn:
         cursor = conn.cursor()
@@ -98,7 +95,7 @@ def main():
             conn.rollback()
             sys.exit(1)
         else:
-            logging.debug("Ingested to db")
+            logging.info("Ingested to db")
             conn.commit()
 
     sys.exit(0)
