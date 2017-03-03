@@ -49,4 +49,3 @@ create index jail_id_idx on booking (jail_id);
 create index arrests_booking_fk_idx on arrests (booking_id);
 create index inmates_booking_fk_idx on inmates (booking_id);
 create index charges_booking_fk_idx on charges (booking_id);
-

@@ -29,10 +29,10 @@ where race = 'O';
 /* Age */
 create temp view ages as (
     select
-        booking.id as booking_id,
-        extract(year from orig_booking_date) - extract(year from inmates.dob) as age
-    from booking
-    join inmates on inmates.booking_id = booking.id
+        inmates.booking_id as booking_id,
+        (arrest_date::date - dob) / 365 as age
+    from inmates
+    join arrests on arrests.booking_id = inmates.booking_id
 );
 
 
