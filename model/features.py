@@ -1,6 +1,5 @@
 """Derive features."""
 
-import pandas as pd
 import re
 
 
@@ -94,25 +93,4 @@ def is_drugcrime(charge, description):
         match(name_pattern, description) or
         any(match(pattern, charge) for pattern in penal_codes)
     )
-
-def rollup_charges(x, by):
-    """Collapse charges into a single record per inmate."""
-
-    groups = x.groupby(by)
-    level_defaults = {name: 0 for name in x.level[x.level.notnull()]}
-
-    records = []
-    for group_index, df in groups:
-        record = {
-            **level_defaults,
-            **df.level.value_counts().to_dict(),
-            "violent_crimes": df.violent.sum(),
-            "drug_crimes":    df.drug.sum(),
-            "n_charges":      df.shape[0],
-            "total_bail":     df.bail.sum(),
-            "booking_id":     group_index
-        }
-        records.append(record)
-
-    return pd.DataFrame(records)
 
