@@ -1,6 +1,6 @@
 """Cluster Analysis of inmates."""
 
-from bookinglog import config
+from config import pg_kwargs
 import features
 
 from collections import Counter
@@ -37,7 +37,7 @@ with open("read.sql", "r") as fh:
     queries = [query.strip() for query in queries]
     inmate_query, charge_query = filter(None, queries)
 
-with psycopg2.connect(**config.pg_kwargs) as conn:
+with psycopg2.connect(**pg_kwargs) as conn:
     df = pd.read_sql(inmate_query, con=conn)
     charges = pd.read_sql(charge_query, con=conn)
 

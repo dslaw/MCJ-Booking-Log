@@ -1,6 +1,6 @@
 """Explore feature engineering on charges."""
 
-from bookinglog import config
+from config import pg_kwargs
 from features_text import tokenize
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
@@ -12,7 +12,7 @@ import pandas as pd
 import psycopg2
 
 
-with psycopg2.connect(**config.pg_kwargs) as conn:
+with psycopg2.connect(**pg_kwargs) as conn:
     charges = pd.read_sql("select * from charges_t", con=conn)
 
 

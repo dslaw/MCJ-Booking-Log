@@ -42,12 +42,12 @@ def train_and_save_models():
     current working directory under `*_crime_classifier.skmodel`.
     """
     # Hidden imports - only used to get training data.
-    from bookinglog import config
+    from config import pg_kwargs
     from features import is_drugcrime, is_violentcrime
     import pandas as pd
     import psycopg2
 
-    with psycopg2.connect(**config.pg_kwargs) as conn:
+    with psycopg2.connect(**pg_kwargs) as conn:
         charges = pd.read_sql("select * from charges_t", con=conn)
 
     drug = map(is_drugcrime, charges.charge, charges.description)

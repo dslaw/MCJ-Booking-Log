@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from bookinglog.config import pg_kwargs
+from config import pg_kwargs
 
 with open("arrivals.sql", "r") as fh:
     query = fh.read()
