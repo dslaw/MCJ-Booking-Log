@@ -1,6 +1,5 @@
 beautifulsoup4
 psycopg2
 pytz
+requests
 schema
-selenium
-setuptools

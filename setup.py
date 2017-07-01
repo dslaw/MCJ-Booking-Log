@@ -3,12 +3,8 @@ from setuptools import setup
 
 pkg_name = "bookinglog"
 
-dependencies = [
-    "beautifulsoup4",
-    "psycopg2",
-    "pytz",
-    "selenium"
-]
+with open("requirements.txt") as fh:
+    dependencies = [line.strip() for line in fh]
 
 setup(
     description="Scrape Marin County Jail Booking Log",

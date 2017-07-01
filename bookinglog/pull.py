@@ -2,7 +2,8 @@
 
 from bs4 import BeautifulSoup
 from collections import ChainMap
-from selenium import webdriver
+
+import requests
 
 
 # Each inmate entry has 3 tables:
@@ -81,35 +82,21 @@ def parse(html):
 def search_terms(term):
     """ Mapping to POST search terms."""
 
-    terms = {
-        "latest": "DisplayLatestBookings",  # Last 48 Hours
-        "current": "DisplayAllBookings",    # Currently In Custody
-    }
-    return terms[term]
+    return {
+        "latest": "DisplayLatestBookings=Last+48+Hours",
+        "current": "DisplayAllBookings=Currently+In+Custody",  # TODO: check
+    }[term]
 
 def scrape(query_type):
     """ Download Booking Log page source."""
 
-    # Number of characters in the html template w/o data.
-    # This can be obtained via:
-    # import requests
-    # response = requests.post(uri, json={"DisplayAllBookings", ""})
-    # len(response.content)
-    template_len = 40705
+    url = "http://apps.marincounty.org/BookingLog/Booking/Action"
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    payload = search_terms(query_type)
+    response = requests.post(url, headers=headers, data=payload)
 
-    # Selenium workaround.
-    uri = "http://apps.marincounty.org/BookingLog"
-    browser = webdriver.PhantomJS()
-    browser.get(uri)
+    if not response.ok:
+        response.raise_for_status()
 
-    button_name = search_terms(query_type)
-    search_button = browser.find_element_by_name(button_name)
-
-    # Assume that data is loaded when the page is loaded.
-    search_button.click()
-    html = browser.page_source
-    browser.close()
-
-    assert len(html) > template_len
-    return html
+    return response.content
 
