@@ -7,7 +7,7 @@ from bookinglog import coerce
 
 
 class TestCoerce(unittest.TestCase):
-    """ Smoke tests."""
+    """Smoke tests."""
 
     def test_keywordize(self):
         d = {

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def catch(*exceptions):
-    """ Log exceptions and return None to indicate failure."""
+    """Log exceptions and return None to indicate failure."""
 
     if not exceptions:
         exceptions = (Exception,)
@@ -35,7 +35,7 @@ def keywordize(x):
     }
 
 def update(d, k, fn):
-    """ Update the value at `d[k]` by applying `fn` to it."""
+    """Update the value at `d[k]` by applying `fn` to it."""
     value = d[k]
     updated = {k: fn(value)}
     return {**d, **updated}
@@ -105,7 +105,7 @@ charge_schema = Schema([{
 
 
 def convert(inmate, charges):
-    """ Convert data to native objects."""
+    """Convert data to native objects."""
 
     # Standardize keys and coervert/validate data.
     inmate = inmate_schema.validate(keywordize(inmate))

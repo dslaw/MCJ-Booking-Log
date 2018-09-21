@@ -17,14 +17,14 @@ import requests
 
 # Parse charge tables (columns)
 def parse_columns(table):
-    """ Extract column names and return as an ordered list."""
+    """Extract column names and return as an ordered list."""
 
     cols = table.find_all("th", {"scope": "col"})
     colnames = [col.text.strip() for col in cols]
     return colnames
 
 def parse_charges(table):
-    """ Extract charge entries and return as a list of maps."""
+    """Extract charge entries and return as a list of maps."""
 
     columns = parse_columns(table)
 
@@ -45,14 +45,14 @@ def parse_charges(table):
 
 # Parse arrest and personal tables (key-values pairs displayed columnwise)
 def parse_row(row):
-    """ Extract key-value pair from a row."""
+    """Extract key-value pair from a row."""
 
     key = row.find("th").text.strip().strip(":")
     value = row.find("td").text.strip()
     return {key: value}
 
 def parse_table(table):
-    """ Extract key-values from table."""
+    """Extract key-values from table."""
 
     rows = table.find_all("tr")
     parsed = map(parse_row, rows)
@@ -84,7 +84,7 @@ def parse(html):
     return list(entries)
 
 def search_terms(term):
-    """ Mapping to POST search terms."""
+    """Mapping to POST search terms."""
 
     return {
         "latest": "DisplayLatestBookings=Last+48+Hours",
@@ -92,7 +92,7 @@ def search_terms(term):
     }[term]
 
 def scrape(query_type):
-    """ Download Booking Log page source."""
+    """Download Booking Log page source."""
 
     url = "http://apps.marincounty.org/BookingLog/Booking/Action"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}

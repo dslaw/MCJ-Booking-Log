@@ -24,7 +24,7 @@ from itertools import starmap
 
 
 def ingest(entries, cursor):
-    """ Add booking log entries to database.
+    """Add booking log entries to database.
 
     Parameters
     ----------
