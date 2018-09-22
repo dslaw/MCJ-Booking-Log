@@ -68,15 +68,19 @@ def parse(html):
     #      Charges
     top_sections = soup.find_all("div", {"id": "sec1"})
     paired_tables = (section.find_all("table") for section in top_sections)
+    arrest_tables, personal_tables = zip(*paired_tables)
     charge_tables = soup.find_all("div", {"id": "sec2"})
 
     # Parse data into maps.
-    # Merge arrest and personal tables together.
-    paired_tables = (map(parse_table, tables) for tables in paired_tables)
-    inmate_tables = ({**arrest, **personal} for arrest, personal in paired_tables)
-    charge_tables = map(parse_charges, charge_tables)
+    arrests = map(parse_table, arrest_tables)
+    personals = map(parse_table, personal_tables)
+    charges = map(parse_charges, charge_tables)
+    inmates = (
+        {**arrest, **personal}
+        for arrest, personal in zip(arrests, personals)
+    )
 
-    entries = zip(inmate_tables, charge_tables)
+    entries = zip(inmates, charges)
     return list(entries)
 
 def search_terms(term):
