@@ -1,7 +1,6 @@
 from datetime import datetime
 from pkg_resources import resource_filename
 import json
-import pytz
 import unittest
 
 from bookinglog import coerce
@@ -66,7 +65,7 @@ class TestCoerce(unittest.TestCase):
         self.assertEqual(out_no_data, expected_no_data)
 
         big_money = "13,333,333.13"
-        expected_big_money = 13333333 # Ignore cents
+        expected_big_money = 13333333  # Ignore cents
         out_big_money = coerce.parse_bail(big_money)
         self.assertEqual(out_big_money, expected_big_money)
 
@@ -81,7 +80,7 @@ class TestCoerce(unittest.TestCase):
         out_not_numeric = coerce.parse_height(not_numeric)
         self.assertEqual(out_not_numeric, expected_not_numeric)
 
-        unexpected = "5' 10\"" # Double quote instead of two single quotes
+        unexpected = "5' 10\""  # Double quote instead of two single quotes
         expected_unexpected = (5 * 12) + 10
         out_unexpected = coerce.parse_height(unexpected)
         self.assertEqual(out_unexpected, expected_unexpected)
@@ -134,4 +133,3 @@ class TestCoerce(unittest.TestCase):
         self.assertEqual(len(charges), 2)
         self.assertEqual(charges[0]["bail"], 0)
         self.assertIsNone(charges[1]["bail"])
-

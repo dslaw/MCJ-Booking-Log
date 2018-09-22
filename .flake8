@@ -2,6 +2,7 @@
 exclude =
     .git,
     __pycache__,
+    bookinglog/queries.py,
 ignore =
     E302,
     E305,

@@ -30,8 +30,8 @@ def parse_charges(table):
 
     rows = table.find_all("tr")
     row_entries = [
-       [entry.text.strip() for entry in row.find_all("td")]
-       for row in rows
+        [entry.text.strip() for entry in row.find_all("td")]
+        for row in rows
     ]
     processed = [
         {col: entry for col, entry in zip(columns, entries)}
@@ -103,4 +103,3 @@ def scrape(query_type):
         response.raise_for_status()
 
     return response.content
-

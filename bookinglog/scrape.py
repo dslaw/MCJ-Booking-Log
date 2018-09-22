@@ -8,7 +8,7 @@ Valid searches are:
     current : all inmates currently in custody.
 """
 # Not supported:
-#last-name : search for a specific inmate by last name.
+# last-name : search for a specific inmate by last name.
 
 import argparse
 import json
@@ -70,7 +70,6 @@ def main():
     logging.basicConfig(**config.logging_cfg)
     logging.info("Running with arguments: {0}".format(args))
 
-
     try:
         logging.info("Starting ingest")
         html = pull.scrape(args.search)
@@ -99,4 +98,3 @@ def main():
             conn.commit()
 
     sys.exit(0)
-

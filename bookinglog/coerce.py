@@ -29,8 +29,10 @@ def catch(*exceptions):
     return decorator
 
 def keywordize(x):
-    keyword = lambda x: x.lower().replace(" ", "_")
-    return {keyword(k): v for k, v in x.items()}
+    return {
+        k.lower().replace(" ", "_"): v
+        for k, v in x.items()
+    }
 
 def update(d, k, fn):
     """ Update the value at `d[k]` by applying `fn` to it."""
@@ -109,4 +111,3 @@ def convert(inmate, charges):
     inmate = inmate_schema.validate(keywordize(inmate))
     charges = charge_schema.validate(list(map(keywordize, charges)))
     return inmate, charges
-

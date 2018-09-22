@@ -42,4 +42,3 @@ insert_charge = (
     "ON CONFLICT (booking_id) DO UPDATE "
     "SET recorded = EXCLUDED.recorded"
 )
-

@@ -22,4 +22,3 @@ class TestParsing(unittest.TestCase):
 
         self.assertEqual(out[1][0]["Name"], "RODRIGUEZ, BENDER BENDING")
         self.assertEqual(len(out[1][1]), 2)
-
