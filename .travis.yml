@@ -4,5 +4,5 @@ python:
 install:
     - pip install -r requirements.txt -r requirements-dev.txt
 script:
-    - flake8 --config=.flake8 bookinglog/
-    - nosetests
+    - flake8 --config=.flake8 bookinglog/ tests/
+    - pytest --cache-clear --verbose tests/

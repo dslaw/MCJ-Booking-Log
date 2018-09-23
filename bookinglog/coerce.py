@@ -28,11 +28,11 @@ def catch(*exceptions):
         return inner
     return decorator
 
-def keywordize(x):
-    return {
-        k.lower().replace(" ", "_"): v
-        for k, v in x.items()
-    }
+def keywordize(string):
+    return string.lower().replace(" ", "_")
+
+def standardize_keys(d):
+    return {keywordize(k): v for k, v in d.items()}
 
 def update(d, k, fn):
     """Update the value at `d[k]` by applying `fn` to it."""
@@ -108,6 +108,6 @@ def convert(inmate, charges):
     """Convert data to native objects."""
 
     # Standardize keys and coervert/validate data.
-    inmate = inmate_schema.validate(keywordize(inmate))
-    charges = charge_schema.validate(list(map(keywordize, charges)))
+    inmate = inmate_schema.validate(standardize_keys(inmate))
+    charges = charge_schema.validate(list(map(standardize_keys, charges)))
     return inmate, charges

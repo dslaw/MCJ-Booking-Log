@@ -13,7 +13,6 @@ setup(
     entry_points={
         "console_scripts": "bookinglog=bookinglog.scrape:main"
     },
-    package_data={pkg_name: ["tests/data/*"]},
     packages=[pkg_name]
 )
 
