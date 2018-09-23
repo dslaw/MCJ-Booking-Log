@@ -23,6 +23,9 @@ from . import pull
 from itertools import starmap
 
 
+logging.basicConfig(**config.logging_cfg)
+
+
 def ingest(entries, cursor):
     """Add booking log entries to database.
 
@@ -54,8 +57,7 @@ def ingest(entries, cursor):
 
     return
 
-def main():
-
+def make_argparser():
     parser = argparse.ArgumentParser(prog="bookinglog", description=__doc__)
     parser.add_argument(
         "-s", "--search",
@@ -63,25 +65,23 @@ def main():
         type=str,
         required=False,
         choices=("latest", "current"),
-        default="latest")
+        default="latest"
+    )
+    return parser
 
-    args = parser.parse_args()
-
-    logging.basicConfig(**config.logging_cfg)
-    logging.info("Running with arguments: {0}".format(args))
+def main(search_type):
+    logging.info("Running with search argument: %s", search_type)
 
     try:
         logging.info("Starting ingest")
-        html = pull.scrape(args.search)
+        html = pull.scrape(search_type)
         entries = pull.parse(html)
         converted_entries = starmap(coerce.convert, entries)
     except Exception as e:
-        msg = "Failed scraping with {0}".format(e)
-        logging.critical(msg)
+        logging.critical("Failed scraping with %s", e)
         sys.exit(1)
     else:
-        msg = "Scraped {0} entries".format(len(entries))
-        logging.info(msg)
+        logging.info("Scraped %s entries", len(entries))
 
     with psycopg2.connect(**config.pg_kwargs) as conn:
         cursor = conn.cursor()
@@ -89,8 +89,7 @@ def main():
         try:
             ingest(converted_entries, cursor)
         except psycopg2.Error as e:
-            msg = "Failed ingest with {0}".format(e)
-            logging.critical(msg)
+            logging.critical("Failed ingest with %s", e)
             conn.rollback()
             sys.exit(1)
         else:
@@ -98,3 +97,9 @@ def main():
             conn.commit()
 
     sys.exit(0)
+
+
+if __name__ == "__main__":
+    parser = make_argparser()
+    args = parser.parse_args()
+    main(args.search)
