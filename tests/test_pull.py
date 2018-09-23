@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import pytest
+import responses
 
 from bookinglog import pull
 
@@ -9,6 +10,10 @@ def html():
     with open("tests/data/mock.html") as fh:
         mock_html = fh.read()
     return mock_html
+
+@pytest.fixture
+def url():
+    return "http://apps.marincounty.org/BookingLog/Booking/Action"
 
 @pytest.fixture
 def table():
@@ -174,3 +179,36 @@ class TestParse(object):
         out = pull.parse(html)
         assert out[0][0] == expected_first
         assert out[1][0] == expected_second
+
+class TestScrape(object):
+    content = "<p>something</p>"
+
+    @responses.activate
+    def test_latest(self, url):
+        def cb(request):
+            expected_body = "DisplayLatestBookings=Last+48+Hours"
+            if request.body != expected_body:
+                return (400, {}, "")
+
+            headers = {"Content-Type": "text/html"}
+            return (200, headers, self.content)
+
+        responses.add_callback(responses.POST, url, callback=cb)
+
+        out = pull.scrape("latest")
+        assert out == self.content.encode()
+
+    @responses.activate
+    def test_current(self, url):
+        def cb(request):
+            expected_body = "DisplayAllBookings=Currently+In+Custody"
+            if request.body != expected_body:
+                return (400, {}, "")
+
+            headers = {"Content-Type": "text/html"}
+            return (200, headers, self.content)
+
+        responses.add_callback(responses.POST, url, callback=cb)
+
+        out = pull.scrape("current")
+        assert out == self.content.encode()
