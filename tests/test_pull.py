@@ -181,34 +181,25 @@ class TestParse(object):
         assert out[1][0] == expected_second
 
 class TestScrape(object):
-    content = "<p>something</p>"
-
+    @pytest.mark.parametrize(
+        "search, expected_body", [
+            ("latest", "DisplayLatestBookings=Last+48+Hours"),
+            ("current", "DisplayAllBookings=Currently+In+Custody"),
+        ],
+        ids=["latest", "current"],
+    )
     @responses.activate
-    def test_latest(self, url):
+    def test_scrape(self, search, expected_body, url):
+        content = "<p>something</p>"
+
         def cb(request):
-            expected_body = "DisplayLatestBookings=Last+48+Hours"
             if request.body != expected_body:
                 return (400, {}, "")
 
             headers = {"Content-Type": "text/html"}
-            return (200, headers, self.content)
+            return (200, headers, content)
 
         responses.add_callback(responses.POST, url, callback=cb)
 
-        out = pull.scrape("latest")
-        assert out == self.content.encode()
-
-    @responses.activate
-    def test_current(self, url):
-        def cb(request):
-            expected_body = "DisplayAllBookings=Currently+In+Custody"
-            if request.body != expected_body:
-                return (400, {}, "")
-
-            headers = {"Content-Type": "text/html"}
-            return (200, headers, self.content)
-
-        responses.add_callback(responses.POST, url, callback=cb)
-
-        out = pull.scrape("current")
-        assert out == self.content.encode()
+        out = pull.scrape(search)
+        assert out == content.encode()
