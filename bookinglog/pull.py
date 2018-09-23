@@ -8,9 +8,9 @@ import requests
 
 # Each inmate entry has 3 tables:
 #
-# 1. Booking Information (arrest-table)
-# 2. Personal Information (personal-table)
-# 3. Charges (no class... assholes)
+# 1. Booking Information (class: arrest-table)
+# 2. Personal Information (class: personal-table)
+# 3. Charges (no class)
 #
 # Booking and personal are placed into the top section,
 # while charges is on the bottom.
