@@ -87,16 +87,90 @@ class TestKeyValueTable(object):
         assert out == expected
 
 class TestParse(object):
-    def test_mock_data(self, html):
+    def test_length(self, html):
         out = pull.parse(html)
-
         assert len(out) == 2
 
-        assert len(out[0]) == 2
-        assert len(out[1]) == 2
+    def test_charges(self, html):
+        expected_first = [{
+            "Charge": "11377 HS",
+            "Description": "Possess controlled substance",
+            "Level": "F",
+            "Bail": "$837.00",
+            "Charge Authority": "Open charges",
+        }, {
+            "Charge": "243(B) PC",
+            "Description": "Battery on PO/Emergency Personnel",
+            "Level": "M",
+            "Bail": "",
+            "Charge Authority": "*Bench warrant",
+        }, {
+            "Charge": "242 PC",
+            "Description": "Battery",
+            "Level": "M",
+            "Bail": "",
+            "Charge Authority": "Court order",
+        }]
+        expected_second = [{
+            "Charge": "23152(A) VC",
+            "Description": "DUI alcohol/drugs",
+            "Level": "M",
+            "Bail": "$0.00",
+            "Charge Authority": "Court order",
+        }, {
+            "Charge": "23152(B) VC",
+            "Description": "DUI alcohol .08 percent",
+            "Level": "M",
+            "Bail": "",
+            "Charge Authority": "Court order",
+        }]
 
-        assert out[0][0]["Name"] == "DUNLOP, FUZZY"
-        assert len(out[0][1]) == 5
+        out = pull.parse(html)
+        assert out[0][1] == expected_first
+        assert out[1][1] == expected_second
 
-        assert out[1][0]["Name"] == "RODRIGUEZ, BENDER BENDING"
-        assert len(out[1][1]) == 2
+    def test_arrest_personal(self, html):
+        expected_first = {
+            # Arrest.
+            "Name": "DUNLOP, FUZZY",
+            "Address": "SAN RAFAEL, CA",
+            "Orig Booking Date": "7/13/2016 3:40 PM",
+            "Latest Charge Date": "7/14/2016 12:59 PM",
+            "Arrest Date": "7/13/2016 3:30 PM",
+            "Arrest Agency": "San Rafael PD",
+            "Arrest Location": "75 ALBERTS PARK",
+            "Jail Id": "PJAILID11",
+            # Personal.
+            "Date of Birth": "10/8/1981",
+            "Occupation": "CONSTRUCTION",
+            "Sex": "M",
+            "Height": "5' 10''",
+            "Weight": "170",
+            "Race": "W",
+            "Hair Color": "BRO",
+            "Eye Color": "BLU",
+        }
+        expected_second = {
+            # Arrest.
+            "Name": "RODRIGUEZ, BENDER BENDING",
+            "Address": "SAN RAFAEL, CA",
+            "Orig Booking Date": "7/15/2016 9:01 AM",
+            "Latest Charge Date": "7/15/2016 9:08 AM",
+            "Arrest Date": "7/15/2016 9:00 AM",
+            "Arrest Agency": "Marin County Sheriff Department",
+            "Arrest Location": "MARIN COUNTY JAIL LOBBY",
+            "Jail Id": "PJAILID12",
+            # Personal.
+            "Date of Birth": "6/26/1959",
+            "Occupation": "BENDER",
+            "Sex": "M",
+            "Height": "6' 04''",
+            "Weight": "200",
+            "Race": "W",
+            "Hair Color": "BLN",
+            "Eye Color": "BLU",
+        }
+
+        out = pull.parse(html)
+        assert out[0][0] == expected_first
+        assert out[1][0] == expected_second
