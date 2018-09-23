@@ -83,23 +83,17 @@ def parse(html):
     entries = zip(inmates, charges)
     return list(entries)
 
-def search_terms(term):
-    """Mapping to POST search terms."""
-
-    return {
-        "latest": "DisplayLatestBookings=Last+48+Hours",
-        "current": "DisplayAllBookings=Currently+In+Custody",  # TODO: check
-    }[term]
-
-def scrape(query_type):
+def scrape(search_type):
     """Download Booking Log page source."""
 
     url = "http://apps.marincounty.org/BookingLog/Booking/Action"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    payload = search_terms(query_type)
-    response = requests.post(url, headers=headers, data=payload)
+    body = {
+        "latest": "DisplayLatestBookings=Last+48+Hours",
+        "current": "DisplayAllBookings=Currently+In+Custody",
+    }[search_type]
+    response = requests.post(url, headers=headers, data=body)
 
     if not response.ok:
         response.raise_for_status()
-
     return response.content
