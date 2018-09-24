@@ -1,12 +1,13 @@
 import logging
+import os
 
-# TODO: read a config file in resources/
+
 pg_kwargs = {
-    "host": "localhost",
-    "port": 5433,
-    "dbname": "bookinglog",
-    "user": "mcj",
-    "password": "breakfasttrays"
+    "host": os.environ.get("POSTGRES_HOST"),
+    "port": os.environ.get("POSTGRES_PORT"),
+    "dbname": os.environ.get("POSTGRES_DB"),
+    "user": os.environ.get("POSTGRES_USER"),
+    "password": os.environ.get("POSTGRES_PASSWORD"),
 }
 
 logging_cfg = {
