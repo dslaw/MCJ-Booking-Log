@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 
 pg_kwargs = {
@@ -11,8 +12,7 @@ pg_kwargs = {
 }
 
 logging_cfg = {
-    "filename": "/home/dave/bookinglog-ingest.log",
-    "filemode": "a",
+    "stream": sys.stdout,
     "level": logging.INFO,
     "format": "%(asctime)s:%(levelname)s: %(message)s",
     "datefmt": "%Y-%m-%d %H:%M:%S"
