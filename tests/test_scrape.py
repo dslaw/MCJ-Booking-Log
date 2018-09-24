@@ -39,7 +39,9 @@ class TestScraper(object):
 
         expected_count = 2
 
-        scrape.main("latest")
+        status = scrape.main("latest")
+
+        assert status == 0
 
         cursor.execute("select count(*) from booking")
         booking_count = cursor.fetchone()[0]

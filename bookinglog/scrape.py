@@ -79,7 +79,7 @@ def main(search_type):
         converted_entries = starmap(coerce.convert, entries)
     except Exception as e:
         logging.critical("Failed scraping with %s", e)
-        sys.exit(1)
+        return 1
     else:
         logging.info("Scraped %s entries", len(entries))
 
@@ -91,15 +91,16 @@ def main(search_type):
         except psycopg2.Error as e:
             logging.critical("Failed ingest with %s", e)
             conn.rollback()
-            sys.exit(1)
+            return 1
         else:
             logging.info("Ingested to db")
             conn.commit()
 
-    sys.exit(0)
+    return 0
 
 
 if __name__ == "__main__":
     parser = make_argparser()
     args = parser.parse_args()
-    main(args.search)
+    status = main(args.search)
+    sys.exit(status)
