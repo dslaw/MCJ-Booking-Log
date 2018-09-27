@@ -203,3 +203,10 @@ class TestScrape(object):
 
         out = pull.scrape(search)
         assert out == content.encode()
+
+    @pytest.mark.external
+    @pytest.mark.parametrize("search", ["latest", "current"])
+    def test_request_returns_html(self, search):
+        out = pull.scrape(search)
+        soup = BeautifulSoup(out, "html.parser")
+        assert soup.body is not None

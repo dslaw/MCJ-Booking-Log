@@ -21,5 +21,6 @@ install:
     - pip install -r requirements.txt -r requirements-dev.txt
 script:
     - flake8 --config=.flake8 bookinglog/ tests/
-    - pytest --cache-clear --verbose -m "not integration" tests/
+    - pytest --cache-clear --verbose -m "not integration and not external" tests/
     - pytest --cache-clear --verbose -m "integration" tests/
+    - pytest --cache-clear --verbose -m "external" tests/
