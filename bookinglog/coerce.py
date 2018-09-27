@@ -93,7 +93,7 @@ inmate_schema = Schema({
     "race": And(str, len_eq1),
     "sex": And(str, len_eq1),
     "weight": Use(int)
-})
+}, ignore_extra_keys=True)
 
 charge_schema = Schema([{
     "bail": Use(parse_bail),
@@ -101,7 +101,7 @@ charge_schema = Schema([{
     "charge_authority": str,
     "description": str,
     "level": And(str, len_eq1)
-}])
+}], ignore_extra_keys=True)
 
 
 def convert(inmate, charges):
