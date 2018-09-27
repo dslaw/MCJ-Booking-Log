@@ -1,8 +1,7 @@
 """Scrape Marin County Jail Booking Log.
 
 Conduct a search of the public booking log and store the
-results. PhantomJS is used to scrape the search results.
-Valid searches are:
+results. Valid searches are:
 
     latest : entries in the last 48 hours.
     current : all inmates currently in custody.
