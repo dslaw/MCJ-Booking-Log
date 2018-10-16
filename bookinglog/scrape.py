@@ -87,7 +87,7 @@ def main(search_type):
 
         try:
             ingest(converted_entries, cursor)
-        except psycopg2.Error as e:
+        except Exception as e:
             logging.critical("Failed ingest with %s", e)
             conn.rollback()
             return 1
