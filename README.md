@@ -48,7 +48,7 @@ First, create a new Python 3.5 environment. Activate it and install dependencies
 into it
 
 ```bash
-pip -r requirements.txt -r requirements-dev.txt
+pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 Choose values for and set the environment variables `POSTGRES_PORT`,
