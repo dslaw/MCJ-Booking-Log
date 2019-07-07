@@ -2,10 +2,14 @@
 
 from nltk import wordpunct_tokenize
 from nltk.stem import PorterStemmer
-from sklearn.externals import joblib
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import (
+    ENGLISH_STOP_WORDS,
+    CountVectorizer,
+    TfidfTransformer
+)
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+import joblib
 
 import re
 import string
@@ -13,29 +17,56 @@ import string
 
 DRUG_MODEL_FILENAME = "drug_crime_classifier.skmodel"
 VIOLENT_MODEL_FILENAME = "violent_crime_classifier.skmodel"
+NUMBER_TOKEN = " num "
 
-def replace_numbers(text, placeholder="num"):
-    repl = " {0} ".format(placeholder)
-    return re.sub(r"\d+", repl, text)
+def preprocess(text):
+    lowered = text.lower()
 
-def replace_controlled(text):
-    """Fix known variations of 'controlled' (e.g. controlled substance)."""
-    return re.sub(r"cntl|cntrd|contld|contrld", "controlled", text)
+    # Fix punctuation.
+    without_slashes = lowered.replace("/", " ")
+    without_punct = re.sub(r"[^\w\s]", "", without_slashes)
 
-def fix_punct(text):
-    s = text.replace("/", " ")
-    return re.sub(r"[^\w\s]", "", s)
+    # Replace numbers with a special token.
+    without_numbers = re.sub(r"\d+", NUMBER_TOKEN, without_punct)
+
+    # Fix known variations of "controlled", as in "controlled substance".
+    fixed = re.sub(r"cntl|cntrd|contld|contrld", "controlled", without_numbers)
+    return fixed
 
 stemmer = PorterStemmer()
 
 def tokenize(text):
-    text = text.lower()
-    normalized = replace_controlled(replace_numbers(fix_punct(text)))
     tokens = [
-        token for token in wordpunct_tokenize(normalized)
+        token for token in wordpunct_tokenize(text)
         if token not in string.punctuation
     ]
     return [stemmer.stem(token) for token in tokens]
+
+def prepare_stop_words(stop_words):
+    prepared_stop_words = set()
+    for w in ENGLISH_STOP_WORDS:
+        p = preprocess(w)
+        stop_tokens = tokenize(p)
+        for t in stop_tokens:
+            prepared_stop_words.add(t)
+    return prepared_stop_words
+
+def make_pipeline():
+    stop_words = prepare_stop_words(ENGLISH_STOP_WORDS)
+    vectorizer = CountVectorizer(
+        analyzer="word",
+        preprocessor=preprocess,
+        tokenizer=tokenize,
+        stop_words=stop_words,
+        max_features=500
+    )
+    weighter = TfidfTransformer(norm=None)
+    classifier = LogisticRegression(solver="liblinear", random_state=13)
+    return Pipeline([
+        ("vectorize", vectorizer),
+        ("weight", weighter),
+        ("classify", classifier)
+    ])
 
 def train_and_save_models():
     """Train crime classification models and persist in the
@@ -55,28 +86,9 @@ def train_and_save_models():
     charges["drug"] = list(drug)
     charges["violent"] = list(violent)
 
-    vectorizer = CountVectorizer(
-        analyzer="word",
-        tokenizer=tokenize,
-        stop_words="english",
-        max_features=500
-    )
-    weighter = TfidfTransformer(norm=None)
-    classifier = LogisticRegression(solver="liblinear", random_state=13)
+    drug_pipeline = make_pipeline()
+    violent_pipeline = make_pipeline()
 
-    drug_pipeline = Pipeline([
-        ("vectorize", vectorizer),
-        ("weight", weighter),
-        ("classify", classifier)
-    ])
-
-    violent_pipeline = Pipeline([
-        ("vectorize", vectorizer),
-        ("weight", weighter),
-        ("classify", classifier)
-    ])
-
-    # Transformers are refit - it's cheap.
     drug_pipeline.fit(charges.description, y=charges.drug)
     violent_pipeline.fit(charges.description, y=charges.violent)
 

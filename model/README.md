@@ -24,6 +24,7 @@ The following packages are necessary, and are all available from the
 
 ```
 hdbscan
+joblib
 matplotlib
 nltk
 numpy
