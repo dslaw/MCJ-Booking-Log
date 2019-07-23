@@ -71,21 +71,20 @@ def make_argparser():
 def main(search_type):
     logging.info("Running with search argument: %s", search_type)
 
-    try:
-        logging.info("Starting ingest")
-        html = pull.scrape(search_type)
-        entries = pull.parse(html)
-        converted_entries = starmap(coerce.convert, entries)
-    except Exception as e:
-        logging.critical("Failed scraping with %s", e)
-        return 1
-    else:
-        logging.info("Scraped %s entries", len(entries))
-
     with psycopg2.connect(**config.pg_kwargs) as conn:
-        cursor = conn.cursor()
+        try:
+            logging.info("Starting ingest")
+            html = pull.scrape(search_type)
+            entries = pull.parse(html)
+            converted_entries = starmap(coerce.convert, entries)
+        except Exception as e:
+            logging.critical("Failed scraping with %s", e)
+            return 1
+        else:
+            logging.info("Scraped %s entries", len(entries))
 
         try:
+            cursor = conn.cursor()
             ingest(converted_entries, cursor)
         except Exception as e:
             logging.critical("Failed ingest with %s", e)
