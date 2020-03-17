@@ -13,7 +13,7 @@ def html():
 
 @pytest.fixture
 def url():
-    return "http://apps.marincounty.org/BookingLog/Booking/Action"
+    return "https://apps.marincounty.org/BookingLog/Booking/Action"
 
 @pytest.fixture
 def table():

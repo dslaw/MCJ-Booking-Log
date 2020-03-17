@@ -86,7 +86,7 @@ def parse(html):
 def scrape(search_type):
     """Download Booking Log page source."""
 
-    url = "http://apps.marincounty.org/BookingLog/Booking/Action"
+    url = "https://apps.marincounty.org/BookingLog/Booking/Action"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     body = {
         "latest": "DisplayLatestBookings=Last+48+Hours",

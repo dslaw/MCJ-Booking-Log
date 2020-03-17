@@ -33,7 +33,7 @@ class TestScraper(object):
         # Ignore the search type - it only effects the search results.
         responses.add(
             method="POST",
-            url="http://apps.marincounty.org/BookingLog/Booking/Action",
+            url="https://apps.marincounty.org/BookingLog/Booking/Action",
             body=html,
         )
 
